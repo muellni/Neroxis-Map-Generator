@@ -18,3 +18,9 @@ add_executable(testgen
 )
 target_include_directories(testgen PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries (testgen Eigen3::Eigen stdc++fs)
+
+add_executable(benchmark
+    test/benchmark.cpp
+)
+target_include_directories(benchmark PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries (benchmark Eigen3::Eigen)

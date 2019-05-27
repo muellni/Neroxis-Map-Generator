@@ -12,10 +12,10 @@
 namespace faf
 {
 
-class BinaryMask : public Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic>
+class BinaryMask : public Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
 {
 protected:
-  typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> super;
+  typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> super;
   faf::Random _random;
   Symmetry symmetry = Symmetry::POINT;
 
@@ -32,11 +32,11 @@ protected:
     switch (symmetry)
     {
     case Symmetry::POINT:
-      for (std::size_t y = 0; y < cols() / 2; ++y)
+      for (std::size_t y = 0; y < rows() / 2; ++y)
       {
-        for (std::size_t x = 0; x < rows(); ++x)
+        for (std::size_t x = 0; x < cols(); ++x)
         {
-          (*this)(cols() - y - 1, rows() - x - 1) = operator()(y, x);
+          coeffRef(rows() - y - 1, cols() - x - 1) = coeff(y, x);
         }
       }
       break;
@@ -48,11 +48,11 @@ protected:
 public:
   BinaryMask randomize(float density)
   {
-    for (std::size_t y = 0; y < cols(); ++y)
+    for (std::size_t y = 0; y < rows(); ++y)
     {
-      for (std::size_t x = 0; x < rows(); ++x)
+      for (std::size_t x = 0; x < cols(); ++x)
       {
-        operator()(y, x) = _random.nextFloat() < density;
+        coeffRef(y, x) = _random.nextFloat() < density;
       }
     }
     applySymmetry();
