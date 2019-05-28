@@ -51,7 +51,7 @@ static auto gen_BinaryMask_cutCorners = [](std::ostream& out)
 
 static auto gen_BinaryMask_acid = [](std::ostream& out)
 {
-  out << randomBinaryMask().acid(0.4) << "\n";
+  out << randomBinaryMask().acid(0.4).acid(0.6) << "\n";
 };
 
 static auto gen_BinaryMask_outline = [](std::ostream& out)

@@ -12,16 +12,22 @@
 namespace faf
 {
 
-class BinaryMask : public Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
+class BinaryMask : public Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic>
 {
 protected:
-  typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> super;
+  typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> super;
   faf::Random _random;
   Symmetry symmetry = Symmetry::POINT;
 
 public:
   BinaryMask(int size, long seed):
     super(size, size),
+    _random(seed)
+  {
+  }
+
+  BinaryMask(BinaryMask const& other, long seed):
+    super(other),
     _random(seed)
   {
   }
@@ -187,44 +193,48 @@ public:
 
   BinaryMask acid(float strength)
   {
-    BinaryMask result(*this);
+    super result(rows(), cols());
     for (std::size_t y = 0; y < rows(); ++y)
     {
       for (std::size_t x = 0; x < cols(); ++x)
       {
-        if (((x > 0 && !(*this)(y, x - 1)) ||
-             (y > 0 && !(*this)(y - 1, x)) ||
-             (x < cols() - 1 && !(*this)(y, x + 1)) ||
-             (y < rows() - 1 && !(*this)(y + 1, x))) &&
+        if (((x > 0 && !coeff(y, x - 1)) ||
+             (y > 0 && !coeff(y - 1, x)) ||
+             (x < cols() - 1 && !coeff(y, x + 1)) ||
+             (y < rows() - 1 && !coeff(y + 1, x))) &&
             _random.nextFloat() < strength)
         {
           result(y, x) = false;
         }
+        else
+        {
+          result(y, x) = coeff(y, x);
+        }
       }
     }
-    *this = result;
+    super::operator=(result);
     applySymmetry();
     return *this;
   }
 
   BinaryMask outline()
   {
-    BinaryMask result(*this);
+    super result(rows(), cols());
     for (std::size_t y = 0; y < cols(); ++y)
     {
       for (std::size_t x = 0; x < rows(); ++x)
       {
-        result(y, x) = ((x > 0 && !(*this)(y, x - 1))
-                    || (y > 0 && !(*this)(y - 1, x))
-                    || (x < cols() - 1 && !(*this)(y, x + 1))
-                    || (y < rows() - 1 && !(*this)(y + 1, x)))
-                  && ((x > 0 && (*this)(y, x - 1))
-                    || (y > 0 && (*this)(y - 1, x))
-                    || (x < cols() - 1 && (*this)(y, x + 1))
-                    || (y < rows() - 1 && (*this)(y + 1, x)));
+        result(y, x) = ((x > 0 && !coeff(y, x - 1))
+                    || (y > 0 && !coeff(y - 1, x))
+                    || (x < cols() - 1 && !coeff(y, x + 1))
+                    || (y < rows() - 1 && !coeff(y + 1, x)))
+                  && ((x > 0 && coeff(y, x - 1))
+                    || (y > 0 && coeff(y - 1, x))
+                    || (x < cols() - 1 && coeff(y, x + 1))
+                    || (y < rows() - 1 && coeff(y + 1, x)));
       }
     }
-    *this = result;
+    super::operator=(result);
     applySymmetry();
     return *this;
   }

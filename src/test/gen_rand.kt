@@ -17,6 +17,12 @@ val gen_rand_int_bound: (PrintStream) -> Unit = {out ->
     }
 }
 
+val gen_rand_long: (PrintStream) -> Unit = {out ->
+    val random = Random(seed)
+    for (i in 1..1000) {
+        out.println(random.nextLong())
+    }
+}
 val gen__rand_float: (PrintStream) -> Unit = {out ->
     val random = Random(seed)
     for (i in 1..1000) {

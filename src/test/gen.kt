@@ -9,21 +9,6 @@ import java.io.File
 
 val seed : Long = 23
 
-fun writeMap(out: PrintStream, map : BinaryMask) {
-    for (y in 0..(map.size-1)) {
-        for (x in 0..(map.size-1)) {
-            if (map.get(x, y)) {
-                out.print("1")
-            }
-            else {
-                out.print("0")
-            }
-            if (x < map.size-1)
-                out.print(" ")
-        }
-        out.print("\n")
-    }
-}
 
 fun write(out: PrintStream, v : Vector2f) {
     out.printf("%.0f\n", v.x)
@@ -34,6 +19,7 @@ fun main() {
     val gens = mapOf(
             "gen_rand_int" to gen_rand_int,
             "gen_rand_int_bound" to gen_rand_int_bound,
+            "gen_rand_long" to gen_rand_long,
             "gen_rand_float" to gen__rand_float,
             "gen_BinaryMask_rand" to gen_BinaryMask_rand,
             "gen_BinaryMask_invert" to gen_BinaryMask_invert,
@@ -50,7 +36,12 @@ fun main() {
             "gen_BinaryMask_minus" to gen_BinaryMask_minus,
             "gen_BinaryMask_fillCircle" to gen_BinaryMask_fillCircle,
             "gen_BinaryMask_trimEdge" to gen_BinaryMask_trimEdge,
-            "gen_BinaryMask_getRandomPosition" to gen_BinaryMask_getRandomPosition
+            "gen_BinaryMask_getRandomPosition" to gen_BinaryMask_getRandomPosition,
+            "gen_FloatMask_rand" to gen_FloatMask_rand,
+            "gen_FloatMask_maskToMoutains" to gen_FloatMask_maskToMoutains,
+            "gen_FloatMask_maskToHeightmap" to gen_FloatMask_maskToHeightmap,
+            "gen_FloatMask_smooth" to gen_FloatMask_smooth,
+            "gen_FloatMask_smooth2" to gen_FloatMask_smooth2
     )
 
     val gendir = Paths.get("/tmp", "java")

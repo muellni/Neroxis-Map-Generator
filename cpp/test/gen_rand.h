@@ -25,6 +25,15 @@ static auto gen_rand_int_bound = [](std::ostream& out)
   }
 };
 
+static auto gen_rand_long = [](std::ostream& out)
+{
+  Random random(seed);
+  for (int i = 0; i < 1000; ++i)
+  {
+    out << random.nextLong() << "\n";
+  }
+};
+
 static auto gen_rand_float = [](std::ostream& out)
 {
   out.precision(3);

@@ -7,6 +7,7 @@
 
 #include "test/gen_rand.h"
 #include "test/gen_BinaryMask.h"
+#include "test/gen_FloatMask.h"
 
 namespace faf {
 
@@ -15,6 +16,7 @@ void rungens()
   std::map<std::string, std::function<void (std::ostream&)>> gens;
   gens.insert(std::make_pair("gen_rand_int", gen_rand_int));
   gens.insert(std::make_pair("gen_rand_int_bound", gen_rand_int_bound));
+  gens.insert(std::make_pair("gen_rand_long", gen_rand_long));
   gens.insert(std::make_pair("gen_rand_float", gen_rand_float));
   gens.insert(std::make_pair("gen_BinaryMask_rand", gen_BinaryMask_rand));
   gens.insert(std::make_pair("gen_BinaryMask_invert", gen_BinaryMask_invert));
@@ -32,6 +34,11 @@ void rungens()
   gens.insert(std::make_pair("gen_BinaryMask_fillCircle", gen_BinaryMask_fillCircle));
   gens.insert(std::make_pair("gen_BinaryMask_trimEdge", gen_BinaryMask_trimEdge));
   gens.insert(std::make_pair("gen_BinaryMask_getRandomPosition", gen_BinaryMask_getRandomPosition));
+  gens.insert(std::make_pair("gen_FloatMask_rand", gen_FloatMask_rand));
+  gens.insert(std::make_pair("gen_FloatMask_maskToMoutains", gen_FloatMask_maskToMoutains));
+  gens.insert(std::make_pair("gen_FloatMask_maskToHeightmap", gen_FloatMask_maskToHeightmap));
+  gens.insert(std::make_pair("gen_FloatMask_smooth", gen_FloatMask_smooth));
+  gens.insert(std::make_pair("gen_FloatMask_smooth2", gen_FloatMask_smooth2));
 
   std::filesystem::path gendir("/tmp");
   auto full_path = gendir / "cpp";
