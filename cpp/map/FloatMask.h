@@ -62,6 +62,12 @@ public:
     return *this;
   }
 
+  FloatMask add(FloatMask const& other)
+  {
+    super::operator+=(other);
+    return *this;
+  }
+
   FloatMask maskToMoutains(float firstSlope, float slope, BinaryMask const& other)
   {
     BinaryMask otherCopy(other, _random.nextLong());

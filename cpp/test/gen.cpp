@@ -5,9 +5,13 @@
 #include <functional>
 #include <filesystem>
 
+#include "map/SCMap.h"
+#include "generator/PropGenerator.h"
+
 #include "test/gen_rand.h"
 #include "test/gen_BinaryMask.h"
 #include "test/gen_FloatMask.h"
+#include "test/gen_SCMapExporter.h"
 
 namespace faf {
 
@@ -39,6 +43,7 @@ void rungens()
   gens.insert(std::make_pair("gen_FloatMask_maskToHeightmap", gen_FloatMask_maskToHeightmap));
   gens.insert(std::make_pair("gen_FloatMask_smooth", gen_FloatMask_smooth));
   gens.insert(std::make_pair("gen_FloatMask_smooth2", gen_FloatMask_smooth2));
+  gens.insert(std::make_pair("gen_SCMapExporter_1", gen_SCMapExporter_1));
 
   std::filesystem::path gendir("/tmp");
   auto full_path = gendir / "cpp";

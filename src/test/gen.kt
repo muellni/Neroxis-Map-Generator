@@ -41,7 +41,8 @@ fun main() {
             "gen_FloatMask_maskToMoutains" to gen_FloatMask_maskToMoutains,
             "gen_FloatMask_maskToHeightmap" to gen_FloatMask_maskToHeightmap,
             "gen_FloatMask_smooth" to gen_FloatMask_smooth,
-            "gen_FloatMask_smooth2" to gen_FloatMask_smooth2
+            "gen_FloatMask_smooth2" to gen_FloatMask_smooth2,
+            "gen_SCMapExporter_1" to gen_SCMapExporter_1
     )
 
     val gendir = Paths.get("/tmp", "java")

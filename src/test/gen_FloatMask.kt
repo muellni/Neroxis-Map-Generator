@@ -1,6 +1,5 @@
 package test
 
-import map.BinaryMask
 import map.FloatMask
 import java.io.PrintStream
 

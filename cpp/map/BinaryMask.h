@@ -326,7 +326,7 @@ public:
     return *this;
   }
 
-  BinaryMask minus(BinaryMask& other)
+  BinaryMask minus(BinaryMask other)
   {
     auto size = std::max(rows(), other.rows());
     if (rows() != size)

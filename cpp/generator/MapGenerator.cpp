@@ -1,244 +1,38 @@
 #include <iostream>
+#include <string>
 
-#include "generator/Random.h"
-#include "map/BinaryMask.h"
+#include "generator/MapGenerator.h"
 
 int main(int argc, char *argv[])
 {
-  /*
-  faf::Random r(123);
-  for (int i = 0; i < 10000; ++i)
+  if (argc < 4)
   {
-    std::cout << i << " " << r.nextFloat() << std::endl;
+    std::cerr << "Usage: generator [targetFolder] [seed] [expectedVersion] (mapName)" << std::endl;
+    return 1;
   }
-  for (int i = 0; i < 10000; ++i)
-  {
-    std::cout << i << " " << r.nextInt() << std::endl;
-  }
-  */
-  std::cout << faf::BinaryMask(16, 123).randomize(0.5f) << std::endl << std::endl;
 
-#if 0
-  std::cout << x << std::endl << std::endl;
-  x.invert();
-  std::cout << x << std::endl << std::endl;
-  x.enlarge(32);
-  std::cout << x << std::endl << std::endl;
-  x.shrink(16);
-  std::cout << x << std::endl << std::endl;
-  x.inflate(1);
-  std::cout << x << std::endl << std::endl;
-  x.deflate(2);
-  std::cout << x << std::endl << std::endl;
-  x.inflate(2);
-  std::cout << x << std::endl << std::endl;
-  x.cutCorners();
-  std::cout << x << std::endl << std::endl;
-  x.acid(0.7);
-  std::cout << x << std::endl << std::endl;
-  x.outline();
-  std::cout << x << std::endl << std::endl;
-  x.smooth(2);
-  std::cout << x << std::endl << std::endl;
-  faf::BinaryMask y(x);
-  y.invert();
-  x.combine(y).combine(y);
-  std::cout << x << std::endl << std::endl;
-  x.intersect(y);
-  std::cout << x << std::endl << std::endl;
-  x(0, 0) = false; x(0, 1) = false; x(0, 2) = true; x(0, 3) = true;
-  y(0, 0) = true; y(0, 1) = false; y(0, 2) = false; y(0, 3) = true;
-  std::cout << x << std::endl << y << std::endl << x.minus(y) << std::endl << std::endl;
-  //x.fillCircle(10,7,3.5,true);
-  //std::cout << x << std::endl << std::endl;
-#endif
+  std::string folderPath(argv[1]);
+  long seed = std::atol(argv[2]);
+  std::string version(argv[3]);
+  std::string mapName(std::string("NeroxisGen_") + faf::MapGenerator::VERSION + "_" + std::to_string(seed));
+  if (argc >= 5)
+  {
+    mapName = std::string(argv[4]);
+  }
+  if (version == faf::MapGenerator::VERSION)
+  {
+    faf::MapGenerator generator;
+    std::cout << "Generating map " << mapName << std::endl;
+    auto map = generator.generate(seed);
+    std::cout << "Saving map to " << folderPath<< std::endl;
+    generator.save(folderPath, mapName, map, seed);
+    std::cout << "Done" << std::endl;
+  }
+  else
+  {
+    std::cerr << "This generator only supports version " << faf::MapGenerator::VERSION << std::endl;
+    return 2;
+  }
+
   return 0;
 }
-
-#if 0
-    try {
-      String folderPath = args[0];
-      long seed = Long.parseLong(args[1]);
-      String version = args[2];
-      String mapName = args.length >= 4 ? args[3] : "NeroxisGen_" + VERSION + "_" + seed;
-
-      if(version.equals(VERSION)) {
-        MapGenerator generator = new MapGenerator();
-        System.out.println("Generating map " + mapName);
-        SCMap map = generator.generate(seed);
-        System.out.println("Saving map to " + Paths.get(folderPath).toAbsolutePath());
-        generator.save(folderPath, mapName, map, seed);
-        System.out.println("Done");
-
-      } else {
-        System.out.println("This generator only supports version " + VERSION);
-
-      }
-    } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-      System.out.println("Usage: generator [targetFolder] [seed] [expectedVersion] (mapName)");
-
-    }
-  }
-
-  public void save(String folderName, String mapName, SCMap map, long seed) {
-    try {
-      Path folderPath = Paths.get(folderName);
-      Files.deleteIfExists(folderPath.resolve(mapName));
-      Files.createDirectory(folderPath.resolve(mapName));
-      SCMapExporter.exportSCMAP(folderPath, mapName, map);
-      SaveExporter.exportSave(folderPath, mapName, map);
-      ScenarioExporter.exportScenario(folderPath, mapName, map);
-      ScriptExporter.exportScript(folderPath, mapName, map);
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public SCMap generate(long seed) throws ExecutionException, InterruptedException {
-    long startTime = System.currentTimeMillis();
-    final Random random = new Random(seed);
-    final SCMap map = new SCMap(512, 6, 64, 10);
-
-    final ConcurrentBinaryMask land = new ConcurrentBinaryMask(16, random.nextLong(), "land");
-    final ConcurrentBinaryMask mountains = new ConcurrentBinaryMask(32, random.nextLong(), "mountains");
-    final ConcurrentBinaryMask plateaus = new ConcurrentBinaryMask(32, random.nextLong(), "plateaus");
-    final ConcurrentBinaryMask ramps = new ConcurrentBinaryMask(128, random.nextLong(), "ramps");
-
-    land.randomize(0.2f).inflate(1).cutCorners().enlarge(32).acid(0.5f).enlarge(128).smooth(4).acid(0.5f);
-    mountains.randomize(0.05f).inflate(1).cutCorners().acid(0.5f).enlarge(128).smooth(4).acid(0.5f);
-    plateaus.randomize(0.1f).inflate(1).cutCorners().acid(0.5f).enlarge(128).smooth(4).acid(0.5f);
-    ramps.randomize(0.1f);
-
-    plateaus.intersect(land).minus(mountains);
-    ramps.intersect(plateaus).outline().minus(plateaus).intersect(land).minus(mountains).inflate(2);
-    land.combine(mountains);
-
-    land.enlarge(513).smooth(6);
-    mountains.enlarge(513).inflate(1).smooth(6);
-    plateaus.enlarge(513).inflate(1).smooth(6);
-
-    ramps.enlarge(513).smooth(6);
-
-    final ConcurrentFloatMask heightmapBase = new ConcurrentFloatMask(513, random.nextLong(), "heightmapBase");
-    final ConcurrentFloatMask heightmapLand = new ConcurrentFloatMask(513, random.nextLong(), "heightmapLand");
-    final ConcurrentFloatMask heightmapMountains = new ConcurrentFloatMask(513, random.nextLong(), "heightmapMountains");
-    final ConcurrentFloatMask heightmapPlateaus = new ConcurrentFloatMask(513, random.nextLong(), "heightmapPlateaus");
-
-    heightmapBase.init(land, 25f, 25f);
-    heightmapLand.maskToHeightmap(0.025f, 0.25f, 95, land).smooth(2);
-
-    heightmapMountains.maskToMoutains(2f, 0.5f, mountains);
-    plateaus.combine(mountains);
-    heightmapPlateaus.init(plateaus, 0, 3f).smooth(5f, ramps);
-    heightmapMountains.add(heightmapPlateaus).smooth(1);
-
-    final ConcurrentBinaryMask grass = new ConcurrentBinaryMask(land, random.nextLong(), "grass");
-    final ConcurrentFloatMask grassTexture = new ConcurrentFloatMask(256, random.nextLong(), "grassTexture");
-    final ConcurrentBinaryMask rock = new ConcurrentBinaryMask(mountains, random.nextLong(), "rock");
-    final ConcurrentFloatMask rockTexture = new ConcurrentFloatMask(256, random.nextLong(), "rockTexture");
-
-    heightmapBase.add(heightmapLand);
-    heightmapBase.add(heightmapMountains);
-
-    grass.deflate(6f).combine(plateaus).shrink(256).inflate(1);
-
-    grassTexture.init(grass, 0, 0.999f).smooth(2);
-
-    ConcurrentBinaryMask plateaus2 = new ConcurrentBinaryMask(plateaus, random.nextLong(), "plateaus2");
-    plateaus.outline().inflate(2).minus(ramps);
-    plateaus2.deflate(1).outline().inflate(2).minus(ramps);
-    rock.inflate(3).combine(plateaus).combine(plateaus2).shrink(256);
-    rockTexture.init(rock, 0, 0.999f).smooth(1);
-
-
-    grass.minus(rock);
-
-    Pipeline.start();
-
-    Pipeline.await(heightmapBase);
-    map.setHeightmap(heightmapBase.getFloatMask());
-    map.getHeightmap().getRaster().setPixel(0, 0, new int[] { 0 });
-
-    Pipeline.stop();
-    System.out.printf("Terrain generation done: %d ms\n", System.currentTimeMillis() - startTime);
-
-    MarkerGenerator markerGenerator = new MarkerGenerator(map, random.nextLong());
-    BinaryMask spawnsMask = new BinaryMask(grass.getBinaryMask(), random.nextLong());
-    spawnsMask.enlarge(513).minus(ramps.getBinaryMask()).deflate(16).trimEdge(20).fillCircle(256, 256, 128, false);
-    markerGenerator.generateSpawns(spawnsMask, 64);
-    BinaryMask resourceMask = new BinaryMask(grass.getBinaryMask().minus(rock.getBinaryMask()), random.nextLong());
-    resourceMask.enlarge(513).minus(ramps.getBinaryMask()).deflate(5);
-    markerGenerator.generateMexs(resourceMask);
-    markerGenerator.generateHydros(resourceMask);
-
-    BinaryMask noProps = new BinaryMask(rock.getBinaryMask(), random.nextLong());
-    noProps.combine(ramps.getBinaryMask());
-    for (int i = 0; i < map.getSpawns().length; i++) {
-      noProps.fillCircle(map.getSpawns()[i].x, map.getSpawns()[i].z, 30, true);
-    }
-    for (int i = 0; i < map.getMexs().length; i++) {
-      noProps.fillCircle(map.getMexs()[i].x, map.getMexs()[i].z, 5, true);
-    }
-    for (int i = 0; i < map.getHydros().length; i++) {
-      noProps.fillCircle(map.getHydros()[i].x, map.getHydros()[i].z, 7, true);
-    }
-
-    PropGenerator propGenerator = new PropGenerator(map, random.nextLong());
-    BinaryMask treeMask = new BinaryMask(32, random.nextLong());
-    treeMask.randomize(0.2f).inflate(1).cutCorners().acid(0.5f).enlarge(128).smooth(4).acid(0.5f);
-    BinaryMask fieldStoneMask = new BinaryMask(treeMask, random.nextLong());
-    treeMask.enlarge(256).intersect(grass.getBinaryMask());
-    fieldStoneMask.invert().enlarge(256).intersect(grass.getBinaryMask());
-    treeMask.enlarge(513).deflate(5).fillCircle(256, 256, 96, false).minus(noProps).trimEdge(3);
-    fieldStoneMask.enlarge(513).deflate(5).fillCircle(256, 256, 96, true).minus(noProps).trimEdge(10);
-
-    propGenerator.generateProps(treeMask, propGenerator.TREE_GROUPS, 3f);
-    propGenerator.generateProps(treeMask, propGenerator.ROCKS, 10f);
-    propGenerator.generateProps(fieldStoneMask, propGenerator.FIELD_STONES, 30f);
-
-    BinaryMask lightGrass = new BinaryMask(grass.getBinaryMask(), random.nextLong());
-    lightGrass.randomize(0.5f);
-    lightGrass.minus(rock.getBinaryMask()).intersect(grass.getBinaryMask()).minus(treeMask.shrink(256));
-    FloatMask lightGrassTexture = new FloatMask(256, random.nextLong());
-    lightGrassTexture.init(lightGrass, 0, 0.999f).smooth(2);
-
-    map.setTextureMaskLow(grassTexture.getFloatMask(), lightGrassTexture, rockTexture.getFloatMask(), new FloatMask(513, 0));
-
-    land.getBinaryMask().shrink(256);
-
-    Graphics g = map.getPreview().getGraphics();
-    for (int x = 0; x < 256; x++) {
-      for (int y = 0; y < 256; y++) {
-        int red = 0;
-        int green = 0;
-        int blue = 127;
-        if (land.getBinaryMask().get(x, y)) {
-          red = 191;
-          green = 191;
-          blue = 0;
-        }
-        if (grass.getBinaryMask().get(x, y)) {
-          red = 0;
-          green = 127;
-          blue = 0;
-        }
-        if (lightGrass.get(x, y)) {
-          red = 0;
-          green = 191;
-          blue = 0;
-        }
-        if (rock.getBinaryMask().get(x, y)) {
-          red = 96;
-          green = 96;
-          blue = 96;
-        }
-        g.setColor(new Color(red, green, blue));
-        g.fillRect(x, y, 1, 1);
-      }
-    }
-
-    return map;
-  }
-}
-#endif
